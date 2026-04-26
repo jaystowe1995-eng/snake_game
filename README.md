@@ -6,7 +6,7 @@ The player controls a snake that grows by eating food while avoiding obstacles a
 The game becomes more challenging as the player progresses through stages.
 
 ---
-## 🎥 Gameplay Demo
+## Gameplay Demo
 
 ### Stage 1 – Collect Food
 The snake grows each time it eats food. The goal is to collect **5 food items** to advance to Stage 2.
@@ -35,7 +35,7 @@ If the snake hits a bomb, it explodes and the game ends.
 ![Bomb Collision](/gifs/bomb.gif)
 
 ---
-# 🎮 Features
+#  Features
 
 - Two gameplay stages
 - Snake grows when eating food
@@ -45,7 +45,7 @@ If the snake hits a bomb, it explodes and the game ends.
 - Pause and restart options
 ---
 
-# 🧩 Game Stages
+#  Game Stages
 
 ## Stage 1 — Food Challenge
 - The player controls the snake using the **arrow keys**.
@@ -71,7 +71,7 @@ If the snake hits a bomb, it explodes and the game ends.
 
 ---
 
-# 🎯 Controls
+# Controls
 
 | Key | Action |
 |----|------|
@@ -90,7 +90,7 @@ If the snake hits a bomb, it explodes and the game ends.
 - OpenGL
 - GLUT
 
-🚀 Future Improvements
+Future Improvements
 
 Possible future improvements:
 - Bomb explosion animation
@@ -113,7 +113,7 @@ Before building the project, ensure you have a C++ compiler and the necessary Op
 
 ---
 
-### 🏗 How to Build
+### How to Build
 Open your terminal or command prompt in the project directory and run the following command:
 
 **On macOS**:
@@ -140,7 +140,7 @@ Once the compilation is successful, execute the generated file:
 snake_game.exe
 ```
 
-🕹 How to Play
+How to Play
 
 Start: Press Enter on the Menu Screen to enter the Stage 1 Title Screen. Press Enter again to start moving.
 
