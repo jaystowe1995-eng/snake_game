@@ -42,7 +42,7 @@ If the snake hits a bomb, it explodes and the game ends.
 - Bomb obstacles in Stage 2
 - Adjustable difficulty
 - Heads-Up Display (HUD)
-- Pause and restart options 
+- Pause and restart options
 ---
 
 # 🧩 Game Stages
@@ -89,7 +89,6 @@ If the snake hits a bomb, it explodes and the game ends.
 - C++
 - OpenGL
 - GLUT
-- macOS afplay (for sound effects)
 
 🚀 Future Improvements
 
@@ -101,4 +100,60 @@ Possible future improvements:
 - Power-up items
 - Sound effects (eat and bomb)
 
+---
 
+## 📖 User Manual
+
+### 🛠 Prerequisites
+Before building the project, ensure you have a C++ compiler and the necessary OpenGL/GLUT libraries installed:
+
+* **macOS**: Install Xcode Command Line Tools. GLUT is included by default.
+* **Linux (Ubuntu/Debian)**: Run `sudo apt-get install build-essential freeglut3-dev`.
+* **Windows**: It is recommended to use **`MSYS2`** or **`MinGW`** to install the `freeglut` package.
+
+---
+
+### 🏗 How to Build
+Open your terminal or command prompt in the project directory and run the following command:
+
+**On macOS**:
+```bash
+g++ main.cpp -framework OpenGL -framework GLUT -o snake_game
+```
+
+**On Linux**:
+```bash
+g++ main.cpp -lGL -lGLU -lglut -o snake_game
+```
+
+### How to Run
+
+Once the compilation is successful, execute the generated file:
+
+**On macOS and Linux**:
+```bash
+./snake_game
+```
+
+**On Windows**:
+```bash
+snake_game.exe
+```
+
+🕹 How to Play
+
+Start: Press Enter on the Menu Screen to enter the Stage 1 Title Screen. Press Enter again to start moving.
+
+Navigation: Use your Arrow Keys to change the direction of the snake.
+
+Objective:
+
+Stage 1: Eat 5 food items while avoiding the outer walls.
+
+Stage 2: Eat 5 more food items while avoiding the bombs and walls.
+
+Difficulty: Press M during the game or on the menu to cycle through difficulty levels. Lower numbers make the snake move faster.
+
+Pause: If you need a break, press P to toggle the pause state.
+
+Restart: If you lose or want to start over, press R to return to the main menu.
