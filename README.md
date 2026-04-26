@@ -11,28 +11,28 @@ The game becomes more challenging as the player progresses through stages.
 ### Stage 1 – Collect Food
 The snake grows each time it eats food. The goal is to collect **5 food items** to advance to Stage 2.
 
-![Stage 1 Demo](stage1.gif)
+![Stage 1 Demo](/gifs/stage1.gif)
 
 ---
 
 ### Stage 2 – Bomb Challenge
 Bombs appear in the environment. The snake must continue collecting food while avoiding bombs.
 
-![Stage 2 Demo](stage2.gif)
+![Stage 2 Demo](/gifs/stage2.gif)
 
 ---
 
 ### Collision with Wall
 If the snake hits the outer wall, the game ends.
 
-![Wall Collision](wall.gif)
+![Wall Collision](/gifs/wall.gif)
 
 ---
 
 ### Bomb Explosion
 If the snake hits a bomb, it explodes and the game ends.
 
-![Bomb Collision](bomb.gif)
+![Bomb Collision](/gifs/bomb.gif)
 
 ---
 # 🎮 Features
