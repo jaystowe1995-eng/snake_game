@@ -40,6 +40,10 @@ If the snake hits the outer wall, the game ends.
 If the snake hits a bomb, it explodes and the game ends.
 
 ![Bomb Collision](/gifs/bomb.gif)
+---
+### Bomb Explosion
+Adjustable difficulty (speed)
+![Bomb Collision](/gifs/speed.gif)
 
 ---
 #  Features
@@ -47,7 +51,7 @@ If the snake hits a bomb, it explodes and the game ends.
 - Two gameplay stages
 - Snake grows when eating food
 - Bomb obstacles in Stage 2
-- Adjustable difficulty
+- Adjustable difficulty (speed)
 - Heads-Up Display (HUD)
 - Pause and restart options
 ---
@@ -76,7 +80,6 @@ Future Improvements
 
 Possible future improvements:
 - Bomb explosion animation
-- Increasing snake speed over time
 - Additional stages and obstacles
 - Background music
 - Power-up items
