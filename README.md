@@ -9,18 +9,25 @@ The game becomes more challenging as the player progresses through stages.
 ## Gameplay Demo
 
 ### Stage 1 – Collect Food
-The snake grows each time it eats food. The goal is to collect **5 food items** to advance to Stage 2.
+- The player controls the snake using the **arrow keys**.
+- The goal is to **eat 5 food items**.
+- Each food increases the snake length and score.
+- If the snake **hits the outer wall**, the player loses.
+- After collecting 5 foods, the player advances to **Stage 2**.
 
 ![Stage 1 Demo](/gifs/stage1.gif)
 
 ---
 
 ### Stage 2 – Bomb Challenge
-Bombs appear in the environment. The snake must continue collecting food while avoiding bombs.
+- The snake continues to eat food.
+- The player must **eat 5 additional food items** to win the game.
+- Bomb obstacles appear on the map.
 
 ![Stage 2 Demo](/gifs/stage2.gif)
 
 ---
+### ⚠ Dangers
 
 ### Collision with Wall
 If the snake hits the outer wall, the game ends.
@@ -45,31 +52,6 @@ If the snake hits a bomb, it explodes and the game ends.
 - Pause and restart options
 ---
 
-#  Game Stages
-
-## Stage 1 — Food Challenge
-- The player controls the snake using the **arrow keys**.
-- The goal is to **eat 5 food items**.
-- Each food increases the snake length and score.
-- If the snake **hits the outer wall**, the player loses.
-- After collecting 5 foods, the player advances to **Stage 2**.
-
----
-
-## Stage 2 — Bomb Challenge
-- The snake continues to grow by eating food.
-- The player must **eat 5 additional food items** to win the game.
-- Bomb obstacles appear on the map.
-
-### ⚠ Dangers
-
-**Bombs**
-- If the snake touches a bomb, it explodes and the game ends.
-
-**Walls**
-- Hitting the outer wall also ends the game.
-
----
 
 # Controls
 
