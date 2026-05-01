@@ -41,7 +41,7 @@ If the snake hits a bomb, it explodes and the game ends.
 
 ![Bomb Collision](/gifs/bomb.gif)
 ---
-### Bomb Explosion
+###  difficulty
 Adjustable difficulty (speed)
 ![Bomb Collision](/gifs/speed.gif)
 
