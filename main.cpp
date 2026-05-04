@@ -18,16 +18,30 @@
 
 using namespace std;
 
+// macOS sound playback
+void playSound(const char* filename, float seconds = 0.0f)
+{
+    string command = "afplay ";
+
+    if(seconds > 0.0f)
+    {
+        command += "-t ";
+        command += to_string(seconds);
+        command += " ";
+    }
+
+    command += filename;
+    command += " >/dev/null 2>&1 &";
+
+    system(command.c_str());
+}
+
 /**************************************************************************
- * Colors
+ * Colors & Globals
  ***************************************************************************/
 #define mapBgR 0.25f
 #define mapBgG 0.90f
 #define mapBgB 0.25f
-
-#define snakeR 0.05f
-#define snakeG 0.05f
-#define snakeB 0.05f
 
 #define wallR 0.15f
 #define wallG 0.15f
@@ -41,9 +55,6 @@ using namespace std;
 #define hudG 0.00f
 #define hudB 0.00f
 
-/**************************************************************************
- * Config
- ***************************************************************************/
 int map_size = 24;
 int maxDifficulty = 7;
 int Difficulty = 6;
@@ -52,17 +63,16 @@ int gameSpeed = 200;
 const int STAGE1_TARGET_SCORE = 5;
 const int STAGE2_TARGET_SCORE = 10;
 
+GLuint snakeTexture; // Global ID for the snake texture
+
 /**************************************************************************
- * Directions
+ * Directions & States
  ***************************************************************************/
 #define UP     1
 #define DOWN   2
 #define LEFT   3
 #define RIGHT  4
 
-/**************************************************************************
- * Screens / states
- ***************************************************************************/
 enum ScreenState
 {
     MENU_SCREEN,
@@ -76,9 +86,6 @@ enum ScreenState
 
 ScreenState screenState = MENU_SCREEN;
 
-/**************************************************************************
- * Game state
- ***************************************************************************/
 deque<pair<int,int>> snake_body;
 int food_pos[2];
 vector<pair<int,int>> bombs;
@@ -89,13 +96,77 @@ int paused = 1;
 int foodAvailable = 0;
 
 /**************************************************************************
- * Utility
+ * Utility & BMP Texture Loading
  ***************************************************************************/
 void updateGameSpeed()
 {
     gameSpeed = Difficulty * 40;
 }
 
+// Function to load an uncompressed 24-bit BMP file
+GLuint loadBMPTexture(const char* filename) {
+    GLuint textureID;
+    FILE* file = fopen(filename, "rb");
+    if (!file) {
+        printf("Image could not be opened\n");
+        return 0;
+    }
+
+    unsigned char header[54]; // 54-byte BMP header
+    if (fread(header, 1, 54, file) != 54) {
+        printf("Not a correct BMP file\n");
+        fclose(file);
+        return 0;
+    }
+
+    if (header[0] != 'B' || header[1] != 'M') {
+        printf("Not a correct BMP file\n");
+        fclose(file);
+        return 0;
+    }
+
+    // Read details from the header
+    int dataPos    = *(int*)&(header[0x0A]);
+    int imageSize  = *(int*)&(header[0x22]);
+    int width      = *(int*)&(header[0x12]);
+    int height     = *(int*)&(header[0x16]);
+
+    // Format fallbacks
+    if (imageSize == 0)    imageSize = width * height * 3;
+    if (dataPos == 0)      dataPos = 54;
+
+    // Create a buffer
+    unsigned char* data = new unsigned char[imageSize];
+
+    // Read the actual data from the file into the buffer
+    fread(data, 1, imageSize, file);
+    fclose(file);
+
+    // Swap BGR to RGB (BMP files store colors in Blue-Green-Red order)
+    for (int i = 0; i < imageSize; i += 3) {
+        unsigned char tmp = data[i];
+        data[i] = data[i + 2];
+        data[i + 2] = tmp;
+    }
+
+    // Create one OpenGL texture
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
+    // Give the image to OpenGL
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+    // Apply filtering and wrapping parameters as studied in lecture
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    delete[] data;
+    return textureID;
+}
+
+// ... (All your drawing functions like drawText, drawSquare, drawCircle remain exactly the same) ...
 void drawText(float x, float y, const string& text, void* font = GLUT_BITMAP_HELVETICA_18)
 {
     glRasterPos2f(x, y);
@@ -175,6 +246,9 @@ void guide()
     printf("\nStage 1: Eat 5 food and grow. Avoid outer walls.");
     printf("\nStage 2: Eat 5 more food to win.");
     printf("\nAvoid bombs and outer walls in Stage 2.");
+    printf("\nSounds:");
+    printf("\n- eat.wav when food is eaten");
+    printf("\n- bomb.wav when bomb is hit");
     printf("\n*********************************************************\n");
 }
 
@@ -215,17 +289,25 @@ bool isBlockedCell(int x, int y, bool includeBombs = true)
 }
 
 /**************************************************************************
- * Drawing game objects
+ * Drawing game objects (Textured Snake)
  ***************************************************************************/
 void drawBodyPart(int x, int y)
 {
-    glColor3f(snakeR, snakeG, snakeB);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, snakeTexture);
+    
+    // REPLACE mode uses the exact colors from texture.bmp
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE); 
+    
     glBegin(GL_POLYGON);
-        glVertex2f(x + 0.1f, y + 0.1f);
-        glVertex2f(x + 0.9f, y + 0.1f);
-        glVertex2f(x + 0.9f, y + 0.9f);
-        glVertex2f(x + 0.1f, y + 0.9f);
+        // Map UV coordinates (0 to 1) to the polygon corners
+        glTexCoord2f(0.0f, 0.0f); glVertex2f(x + 0.1f, y + 0.1f);
+        glTexCoord2f(1.0f, 0.0f); glVertex2f(x + 0.9f, y + 0.1f);
+        glTexCoord2f(1.0f, 1.0f); glVertex2f(x + 0.9f, y + 0.9f);
+        glTexCoord2f(0.0f, 1.0f); glVertex2f(x + 0.1f, y + 0.9f);
     glEnd();
+    
+    glDisable(GL_TEXTURE_2D);
 }
 
 void drawSnake()
@@ -235,14 +317,21 @@ void drawSnake()
     int hx = snake_body[0].first;
     int hy = snake_body[0].second;
 
-    glColor3f(snakeR, snakeG, snakeB);
+    // Draw textured head
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, snakeTexture);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    
     glBegin(GL_POLYGON);
-        glVertex2f(hx + 0.1f, hy + 0.1f);
-        glVertex2f(hx + 0.9f, hy + 0.1f);
-        glVertex2f(hx + 0.9f, hy + 0.9f);
-        glVertex2f(hx + 0.1f, hy + 0.9f);
+        glTexCoord2f(0.0f, 0.0f); glVertex2f(hx + 0.1f, hy + 0.1f);
+        glTexCoord2f(1.0f, 0.0f); glVertex2f(hx + 0.9f, hy + 0.1f);
+        glTexCoord2f(1.0f, 1.0f); glVertex2f(hx + 0.9f, hy + 0.9f);
+        glTexCoord2f(0.0f, 1.0f); glVertex2f(hx + 0.1f, hy + 0.9f);
     glEnd();
+    
+    glDisable(GL_TEXTURE_2D);
 
+    // Draw eyes over the head texture
     glColor3f(1.0f, 1.0f, 1.0f);
     drawSquare(hx + 0.62f, hy + 0.62f, hx + 0.76f, hy + 0.76f);
     drawSquare(hx + 0.62f, hy + 0.26f, hx + 0.76f, hy + 0.40f);
@@ -251,6 +340,7 @@ void drawSnake()
     drawSquare(hx + 0.67f, hy + 0.67f, hx + 0.72f, hy + 0.72f);
     drawSquare(hx + 0.67f, hy + 0.31f, hx + 0.72f, hy + 0.36f);
 
+    // Draw textured body parts
     for(size_t i = 1; i < snake_body.size(); i++)
         drawBodyPart(snake_body[i].first, snake_body[i].second);
 }
@@ -583,6 +673,7 @@ void moveSnake(int newDirection)
 
     if(screenState == PLAYING_STAGE2 && isBomb(newX, newY))
     {
+        playSound("bomb.wav", 0.8f);
         gameOver("Boom! You hit a bomb.");
         return;
     }
@@ -591,6 +682,7 @@ void moveSnake(int newDirection)
     {
         score++;
         foodAvailable = 0;
+        playSound("eat.wav", 0.25f);
     }
 
     snake_body.push_front({newX, newY});
@@ -783,6 +875,7 @@ void keyboard(unsigned char key, int, int)
         case 27:
         {
             showFinalScore();
+            system("killall afplay >/dev/null 2>&1");
             exit(0);
             break;
         }
@@ -829,7 +922,10 @@ int main(int argc, char** argv)
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
     glutInitWindowSize(map_size * 28, map_size * 28);
     glutInitWindowPosition(200, 100);
-    glutCreateWindow("Snake Game - Two Stages");
+    glutCreateWindow("Snake Game");
+
+    // Load the external texture file
+    snakeTexture = loadBMPTexture("sn.bmp");
 
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
